@@ -1,15 +1,4 @@
-/*!
-=========================================================
-* Muse Ant Design Dashboard - v1.0.0
-=========================================================
-* Product Page: https://www.creative-tim.com/product/muse-ant-design-dashboard
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/muse-ant-design-dashboard/blob/main/LICENSE.md)
-* Coded by Creative Tim
-=========================================================
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Layout,
@@ -29,6 +18,7 @@ import {
   InstagramOutlined,
   GithubOutlined
 } from "@ant-design/icons";
+import axios from "axios";
 function onChange(checked) {
   console.log(`switch to ${checked}`);
 }
@@ -36,13 +26,57 @@ const { Title } = Typography;
 const { Header, Footer, Content } = Layout;
 
 const Signin = () => {
-  const onFinish = (values) => {
-    console.log("Success:", values);
+
+
+  const [userName, setUserName] = useState("")
+  const [passWord, setPassWord] = useState("")
+
+  const onFinis = async (values) => {
+    await  axios({
+       method: 'post',
+       url: 'http://localhost:8080/api/auth/signup',
+   
+     });
+     console.log("Success:", values);
+ 
+   };
+let     data = {
+  username:  userName,    
+  password: passWord
+}
+
+   const onFinish = (event) => {
+    event.preventDefault(); // prevent default form submission behavior
+    loginApi(); // call the loginApi function
   };
+
+   async function loginApi() {
+  // waiting();
+  const urlApi = `http://localhost:8080/api/auth/signup
+  
+  // =${encodeURIComponent(
+  //   userName
+  // )}&password=${encodeURIComponent(passWord
+    
+    )}`;
+  const res = await   ("post", urlApi, data).catch((e) => {
+    // setTimeout(() => {
+    //   window.location.reload();
+    // }, 3000);
+    // errorSwal(e.response.data.detail);
+  });
+  console.log(res.data)
+}
+
+
+
+
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
+
+  
   return (
     <>
       <Layout className="layout-default layout-signin">
@@ -50,37 +84,6 @@ const Signin = () => {
           <Link to="/" className="header-col header-brand">
             <h5>Rubrics</h5>
           </Link>
-          {/* <div className="header-col header-nav">
-              <Menu mode="horizontal" defaultSelectedKeys={["1"]}>
-                <Menu.Item key="1">
-                  <Link to="/dashboard">
-                    {template}
-                    <span> Dashboard</span>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="2">
-                  <Link to="/profile">
-                    {profile}
-                    <span>Profile</span>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="3">
-                  <Link to="/sign-up">
-                    {signup}
-                    <span> Sign Up</span>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="4">
-                  <Link to="/signin">
-                    {signin}
-                    <span> Sign In</span>
-                  </Link>
-                </Menu.Item>
-              </Menu>
-            </div>
-            <div className="header-col header-btn">
-              <Button type="primary">FREE DOWNLOAD</Button>
-            </div> */}
         </Header>
         <Content className="signin">
           <Row gutter={[24, 0]} justify="space-around">
@@ -109,8 +112,13 @@ const Signin = () => {
                       message: "Please input your email!"
                     }
                   ]}
+
                 >
-                  <Input placeholder="Email" />
+                  <Input placeholder="Email" 
+                   onChange={(e) => {
+                    setUserName(e.target.value);
+                  }}
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -124,7 +132,9 @@ const Signin = () => {
                     }
                   ]}
                 >
-                  <Input placeholder="Password" />
+                  <Input placeholder="Password"  onChange={(e) => {
+                  setPassWord(e.target.value);
+                }} />
                 </Form.Item>
 
                 <Form.Item
@@ -147,7 +157,7 @@ const Signin = () => {
                 </Form.Item>
                 <p className="font-semibold text-muted">
                   Don't have an account?{" "}
-                  <Link to="/sign-up" className="text-dark font-bold">
+                  <Link to="/signup" className="text-dark font-bold">
                     Sign Up
                   </Link>
                 </p>
