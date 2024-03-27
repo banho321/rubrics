@@ -84,10 +84,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.validation.Valid;
 
-@Tag(name = "Auth", description = "Auth management APIs")
+@Tag(name = "Accounts")
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 public class AuthController {
 	@Autowired
 	AuthenticationManager authenticationManager;
@@ -107,10 +107,10 @@ public class AuthController {
 	@Autowired
 	JwtUtils jwtUtils;
 
-	@PostMapping("/signin")
-	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+	@PostMapping("v1/accounts/signin")
+	public ResponseEntity<?> authenticateUser(@RequestParam("username") String username, @RequestParam("password") String password) {
 	    try {
-	    	Optional<Account> userOptional = userRepository.findByUsername(loginRequest.getUsername());
+	    	Optional<Account> userOptional = userRepository.findByUsername(username);
 	        if (!userOptional.isPresent()) {
 	            return ResponseEntity.badRequest().body(new MessageResponse("Tên đăng nhập không tồn tại."));
 	        }
@@ -120,7 +120,7 @@ public class AuthController {
 	            return ResponseEntity.badRequest().body(new MessageResponse("Vui lòng xác nhận email trước khi đăng nhập."));
 	        }
 	        Authentication authentication = authenticationManager.authenticate(
-	                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+	                new UsernamePasswordAuthenticationToken(username, password));
 
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
 	        String jwt = jwtUtils.generateJwtToken(authentication);
@@ -143,8 +143,7 @@ public class AuthController {
 	    }
 	}
 
-
-	@PostMapping("/signup")
+	@PostMapping("v1/accounts/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 	    try {
 	        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -202,7 +201,7 @@ public class AuthController {
 	    }
 	}
 
-	@PostMapping("/verifyCode")
+	@PostMapping("v1/accounts/verifyCode")
 	public ResponseEntity<?> verifyEmail(@RequestParam("email") String email, @RequestParam("code") String code) {
 	    try {
 	        Optional<Account> userOptional = userRepository.findByEmailAndVerificationCode(email, code);
